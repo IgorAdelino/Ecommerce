@@ -32,8 +32,13 @@ var userSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
     address: [{type: mongoose.Schema.Types.ObjectId, ref: "Address"}],
     wishList: [{type: mongoose.Schema.Types.ObjectId, ref: "Product"}],
+    refreshToken: {type: String},
     }, 
     {
     timestamps: true,
