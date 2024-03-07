@@ -1,9 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const dbConnect = require('./config/dbConnect')
+const dbConnect = require('./config/db-connect')
 const dotenv = require('dotenv').config()
 const authRouter = require('./routes/auth-route')
-const { notFound, errorHandler } = require('./middlewares/errorHandler')
+const { notFound, errorHandler } = require('./middlewares/error-handler')
 const app = express()
 const PORT = process.env.PORT || 4000
 

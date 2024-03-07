@@ -5,13 +5,11 @@ var userSchema = new mongoose.Schema({
     firstName:{
         type:String,
         required:true,
-        unique:true,
     },
     lastName:{
       type:String,
       required:true,
-      unique:true,
-  },
+    },
     email:{
         type:String,
         required:true,
@@ -26,7 +24,21 @@ var userSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-});
+    role:{
+        type: String,
+        default: "user",
+    },
+    cart: {
+        type: Array,
+        default: [],
+    },
+    address: [{type: mongoose.Schema.Types.ObjectId, ref: "Address"}],
+    wishList: [{type: mongoose.Schema.Types.ObjectId, ref: "Product"}],
+    }, 
+    {
+    timestamps: true,
+    }
+);
 
 userSchema.pre('save', async function(next){
     if(!this.isModified('password')){
