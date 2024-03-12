@@ -240,6 +240,49 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.json(user)
 })
 
+const loginAdmin = asyncHandler(async (req, res) => {
+  const {email, password} = req.body
+
+  const findAdmin = await User.findOne({email: email})
+  if(findAdmin.role !== 'admin'){
+    throw new Error("Not authorized")
+  }
+  if(findAdmin && (await findAdmin.isPasswordMatched(password))) {
+    const refreshToken = generateRefreshToken(findAdmin?._id)
+
+    await User.findByIdAndUpdate(findAdmin?._id, {
+      refreshToken: refreshToken
+    }, {new: true})
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000
+    })
+
+    res.json({
+      id: findAdmin?._id,
+      firstName: findAdmin?.firstName,
+      lastName: findAdmin?.lastName,
+      email: findAdmin?.email,
+      mobile: findAdmin?.mobile,
+      token: generateToken(findAdmin?._id)
+    })
+  }else{
+    throw new Error("Invalid credentials")
+  }
+})
+
+const getWishList = asyncHandler(async (req, res) => {
+  const {id} = req.user
+  validateMongoDBId(id)
+  try {
+    const findUser = await User.findById(id).populate("wishList")
+    res.json(findUser)
+  }catch(error){
+    throw new Error(error)
+  }
+})
+
 module.exports = {
   createUser,
   loginUser,
@@ -253,5 +296,7 @@ module.exports = {
   logoutUser,
   updatePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  loginAdmin,
+  getWishList
 }

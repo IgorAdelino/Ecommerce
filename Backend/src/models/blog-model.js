@@ -27,6 +27,7 @@ var blogSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,7 +47,10 @@ var blogSchema = new mongoose.Schema({
     author: {
       type: String,
       default: "Admin"
-    }
+    },
+    images: {
+      type: Array,
+    },
 },{
   toJSON: { virtuals: true }, toObject: { virtuals: true }
 },{
