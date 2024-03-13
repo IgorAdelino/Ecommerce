@@ -13,7 +13,7 @@ var orderSchema = new mongoose.Schema({
     orderStatus: {
       type: String,
       default: "Not processed",
-      enum: ["Not processed", "Processing", "Shipped", "Delivered", "Cancelled"],
+      enum: ["Not processed", "Cash on Delivery", "Processing", "Dispatched", "Cancelled", "Delivered"],
     },
     orderBy: {
       type: mongoose.Schema.Types.ObjectId,

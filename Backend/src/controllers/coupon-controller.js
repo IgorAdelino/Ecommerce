@@ -1,4 +1,4 @@
-const Coupon = require('../models/coupom-model')
+const Coupon = require('../models/coupon-model')
 const validateMongoDbId = require('../utils/validate-mongodb-id')
 const asyncHandler = require("express-async-handler")
 
