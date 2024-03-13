@@ -1,5 +1,7 @@
 const { generateToken } = require("../config/jwtToken")
 const User = require("../models/user-model")
+const Product = require("../models/product-model")
+const Cart = require("../models/cart-model")
 const asyncHandler = require("express-async-handler")
 const validateMongoDBId = require("../utils/validate-mongodb-id")
 const { generateRefreshToken } = require("../config/refresh-token")
@@ -197,6 +199,31 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 })
 
+const saveAddress = asyncHandler(async (req, res) => {
+  const {id} = req.user
+  validateMongoDBId(id)
+  
+  const {address} = req.body
+
+  const user = await User.findById(id)
+
+  if(!user){
+    throw new Error("User not found with this id")
+  }
+
+ try {
+  const updateUser = await User.findByIdAndUpdate(id, {
+    address
+  }, {
+    new: true
+  })
+
+  res.json(updateUser)
+ } catch (error) {
+  throw new Error(error)
+ }
+})
+
 const forgotPassword = asyncHandler(async (req, res) => {
   const {email} = req.body
   const user = await User.findOne({email})
@@ -283,6 +310,60 @@ const getWishList = asyncHandler(async (req, res) => {
   }
 })
 
+const userCart = asyncHandler(async (req, res) => {
+  const {id} = req.user
+  const {cart} = req.body
+  validateMongoDBId(id)
+  try {
+    let products = []
+    const user = await User.findById(id)
+    
+    const alreadyExistCart = await Cart.findOne({orderBy: user?._id})
+    console.log(alreadyExistCart)
+    if(alreadyExistCart){
+      alreadyExistCart.deleteOne()
+    }
+
+
+    for(let i = 0; i<cart.length; i++){
+      let object = {}
+      object.product = cart[i]._id
+      object.count = cart[i].count
+      let getPrice = await Product.findById(cart[i]._id).select("price").exec()
+      object.price = getPrice.price
+      products.push(object)
+    }
+
+    let cartTotal = 0
+
+    for(let i = 0; i<products.length; i++){
+      cartTotal = cartTotal + products[i].price * products[i].count
+    }
+    
+    let newCart = await Cart.create({
+      products,
+      cartTotal,
+      orderBy: user?._id
+    })
+
+    res.json(newCart)
+  }catch(error){
+    throw new Error(error)
+  }
+})
+
+const getUserCart = asyncHandler(async (req, res) => {
+  const{id} = req.user
+  validateMongoDBId(id)
+  try {
+    const cart = await Cart.findOne({orderBy: id}).populate("products.product")
+
+    res.json(cart)
+  }catch(error){
+    throw new Error(error)
+  }
+})
+
 module.exports = {
   createUser,
   loginUser,
@@ -298,5 +379,8 @@ module.exports = {
   forgotPassword,
   resetPassword,
   loginAdmin,
-  getWishList
+  getWishList,
+  saveAddress,
+  userCart,
+  getUserCart,
 }

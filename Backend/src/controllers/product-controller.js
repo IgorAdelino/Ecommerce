@@ -71,6 +71,8 @@ const getAProduct = asyncHandler(async (req, res) => {
   }
 })
 
+
+
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const queryObj = { ...req.query }
